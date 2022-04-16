@@ -237,6 +237,18 @@ UTEST(main, output)
 		     "P26113.7 > tmp_1.txt");
     ASSERT_EQ(out, 0);
 
+
+    FILE *fp = fopen("tmp_2.txt","w");
+    fprintf(fp,"exam: 2020110305, ncoils: 16, ny: 256, nx: 256\n"
+	    "successfully wrote: image_exam_2020110305.jpg");
+    fclose(fp);
+    
+    out = system("diff -w tmp_1.txt tmp_2.txt");
+    
+    ASSERT_EQ(out, 0);
+
+
+
     image *im_test = read_image("image_exam_2020110305.jpg");
     image *im_sol = read_image("tests/sol.jpg");
 
@@ -248,19 +260,10 @@ UTEST(main, output)
     im_test = NULL;
     im_sol = NULL;
 
-    FILE *fp = fopen("tmp_2.txt","w");
-    fprintf(fp,"exam: 2020110305, ncoils: 16, ny: 256, nx: 256\n"
-	    "successfully wrote: image_exam_2020110305.jpg");
-    fclose(fp);
-    
-    out = system("diff -w tmp_1.txt tmp_2.txt");
-    
-    ASSERT_EQ(out, 0);
-
     int ret = system("rm tmp_1.txt tmp_2.txt "
 		     "image_exam_2020110305.jpg");
     (void)ret;
-
+    
 }
 
 
@@ -360,13 +363,13 @@ image * read_image(char *filename)
 				       &height, &channels, 0);
 
     image *im = malloc(sizeof(*im) +
-		       sizeof(double)*(size_t)(width*height));
+		       sizeof(unsigned char)*(size_t)(width*height));
 
     im->ny = height;
     im->nx = width;
 
-    memcpy(im->data, im,
-	   sizeof(double)*(size_t)(width*height));
+    memcpy(im->data, im_char,
+	   sizeof(unsigned char)*(size_t)(width*height));
 
     free(im_char);
     im_char = NULL;
@@ -374,77 +377,3 @@ image * read_image(char *filename)
     return im;
 }
 
-/* void round_image(image *y) */
-/* { */
-/*     for (int i = 0; i < (y->nx)*(y->ny); ++i) */
-/*     { */
-/* 	y->data[i] = (double)((int)y->data[i]); */
-/*     } */
-/* } */
-    
-
-
-
-
-
-/* void skip_lines(FILE *fp, int n_lines) */
-/* { */
-/*     // Skip the first n lines */
-/*     for (int i = 0; i < n_lines; ++i) */
-/*     { */
-/* 	if (fscanf(fp, "%*[^\n]\n") == -1) */
-/* 	{ */
-/* 	    printf("ERROR: fscanf() failed in %s on line %i\n", */
-/* 		  __FILE__,__LINE__); */
-/* 	} */
-/*     } */
-/* } */
-
-/* image * read_2d_mtx(char *filename) */
-/* { */
-
-/*     int size_0, size_1; */
-    
-/*     FILE *fp; */
-/*     fp = fopen(filename,"r"); */
-
-/*     if (fp == NULL) */
-/*     { */
-/* 	printf("FILE %s not found!\n",filename); */
-/* 	exit(1); */
-/*     } */
-    
-/*     int n_lines = 2; */
-/*     skip_lines(fp, n_lines); */
-    
-/*     // read in data and find max value */
-/*     if (fscanf(fp,"%i %i", &size_0, &size_1) == -1) */
-/*     { */
-/* 	printf("ERROR: fscanf() failed in %s on line %i\n", */
-/* 	      __FILE__,__LINE__); */
-/*     } */
-    
-/*     image *A = malloc(sizeof(*A) + */
-/* 		    (size_t)(size_0)*(size_1)*sizeof(double)); */
-
-/*     A->ny = size_0; */
-/*     A->nx = size_1; */
-/*     A->nc = 1; */
-    
-/*     for (int n = 0; n < A->nx; n++) */
-/*     { */
-/* 	for (int m = 0; m < A->ny ; m++) */
-/* 	{ */
-/* 	    if ((fscanf(fp,"%lf",A->data+(m*A->nx +n)) != 1) || */
-/* 		feof(fp)) */
-/* 	    { */
-/* 		printf("ERROR: fscanf() failed in %s on line %i\n", */
-/* 		       __FILE__,__LINE__); */
-
-/* 	    } */
-/* 	} */
-/*     } */
-/*     fclose(fp); */
-
-/*     return A; */
-/* } */
